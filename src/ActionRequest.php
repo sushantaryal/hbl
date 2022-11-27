@@ -40,8 +40,8 @@ use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
 {
-    // private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
-    private const PaymentEndpoint = "https://core.paco.2c2p.com";
+    private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
+    // private const PaymentEndpoint = "https://core.paco.2c2p.com";
 
     protected Client $client;
 
