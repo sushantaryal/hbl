@@ -16,7 +16,7 @@ class Inquiry extends ActionRequest
     {
         $now = Carbon::now();
 
-        $officeId = "DEMOOFFICE";
+        $officeId = SecurityData::$OfficeId;
         $orderNo = "1635476979216";
 
         $request = [
@@ -64,7 +64,7 @@ class Inquiry extends ActionRequest
     {
         $now = Carbon::now();
 
-        $officeId = "DEMOOFFICE";
+        $officeId = SecurityData::$OfficeId;
         $orderNo = "1635476979216";
 
         $request = [

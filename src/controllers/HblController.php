@@ -45,11 +45,11 @@ class HblController extends Controller
 
     public function paymentCanceled(Request $request)
     {
-        dd($request->all());
+        return view('bickyraj.hbl.canceled');
     }
 
     public function paymentFailed(Request $request)
     {
-        dd($request->all());
+        return view('bickyraj.hbl.failed');
     }
 }

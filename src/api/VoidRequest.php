@@ -14,7 +14,7 @@ class VoidRequest extends ActionRequest
      */
     public function Execute(): string
     {
-        $officeId = "DEMOOFFICE";
+        $officeId = SecurityData::$OfficeId;
         $orderNo = "1643362945102"; //OrderNo can be Refund/Void one time only
         $productDescription = "Sample request for 1643362945102";
 
@@ -54,7 +54,7 @@ class VoidRequest extends ActionRequest
     public function ExecuteJose(): string
     {
         $now = Carbon::now();
-        $officeId = "DEMOOFFICE";
+        $officeId = SecurityData::$OfficeId;
         $orderNo = "1643362945102"; //OrderNo can be Refund/Void one time only
         $productDescription = "Sample request for 1643362945102";
 
