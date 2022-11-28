@@ -5,7 +5,6 @@ namespace Bickyraj\Hbl\Api;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Bickyraj\Hbl\ActionRequest;
-use Bickyraj\Hbl\Config\SecurityData;
 
 class Refund extends ActionRequest
 {
@@ -14,7 +13,7 @@ class Refund extends ActionRequest
      */
     public function Execute(): string
     {
-        $officeId = SecurityData::$OfficeId;
+        $officeId = config('hbl.OfficeId');
         $orderNo = "1643362945100"; //OrderNo can be Refund one time only
 
         $actionBy = "System|c88ef0dc-14ea-4556-922b-7f62a6a3ec9e";
@@ -46,7 +45,7 @@ class Refund extends ActionRequest
         $response = $this->client->post('api/1.0/Refund/refund', [
             'headers' => [
                 'Accept' => 'application/json',
-                'apiKey' => SecurityData::$AccessToken,
+                'apiKey' => config('hbl.AccessToken'),
                 'Content-Type' => 'application/json; charset=utf-8'
             ],
             'body' => $stringRequest
@@ -62,7 +61,7 @@ class Refund extends ActionRequest
     public function ExecuteJose(): string
     {
         $now = Carbon::now();
-        $officeId = SecurityData::$OfficeId;
+        $officeId = config('hbl.OfficeId');
         $orderNo = "1643362945100"; //OrderNo can be Refund one time only
 
         $actionBy = "System|c88ef0dc-14ea-4556-922b-7f62a6a3ec9e";
@@ -88,17 +87,17 @@ class Refund extends ActionRequest
 
         $payload = [
             "request" => $request,
-            "iss" => SecurityData::$AccessToken,
+            "iss" => config('hbl.AccessToken'),
             "aud" => "PacoAudience",
-            "CompanyApiKey" => SecurityData::$AccessToken,
+            "CompanyApiKey" => config('hbl.AccessToken'),
             "iat" => $now->unix(),
             "nbf" => $now->unix(),
             "exp" => $now->addHour()->unix(),
         ];
 
         $stringPayload = json_encode($payload);
-        $signingKey = $this->GetPrivateKey(SecurityData::$MerchantSigningPrivateKey);
-        $encryptingKey = $this->GetPublicKey(SecurityData::$PacoEncryptionPublicKey);
+        $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
+        $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
 
         $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
 
@@ -106,15 +105,15 @@ class Refund extends ActionRequest
         $response = $this->client->post('api/1.0/Refund/refund', [
             'headers' => [
                 'Accept' => 'application/jose',
-                'CompanyApiKey' => SecurityData::$AccessToken,
+                'CompanyApiKey' => config('hbl.AccessToken'),
                 'Content-Type' => 'application/jose; charset=utf-8'
             ],
             'body' => $body
         ]);
 
         $token = $response->getBody()->getContents();
-        $decryptingKey = $this->GetPrivateKey(SecurityData::$MerchantDecryptionPrivateKey);
-        $signatureVerificationKey = $this->GetPublicKey(SecurityData::$PacoSigningPublicKey);
+        $decryptingKey = $this->GetPrivateKey(config('hbl.MerchantDecryptionPrivateKey'));
+        $signatureVerificationKey = $this->GetPublicKey(config('hbl.PacoSigningPublicKey'));
 
         return $this->DecryptToken($token, $decryptingKey, $signatureVerificationKey);
     }

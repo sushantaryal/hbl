@@ -5,7 +5,6 @@ namespace Bickyraj\Hbl\Api;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Bickyraj\Hbl\ActionRequest;
-use Bickyraj\Hbl\Config\SecurityData;
 
 class Inquiry extends ActionRequest
 {
@@ -16,7 +15,8 @@ class Inquiry extends ActionRequest
     {
         $now = Carbon::now();
 
-        $officeId = SecurityData::$OfficeId;
+        // $officeId = SecurityData::$OfficeId;
+        $officeId = config('hbl.OfficeId');
         $orderNo = "1635476979216";
 
         $request = [
@@ -47,7 +47,7 @@ class Inquiry extends ActionRequest
         $response = $this->client->post('api/1.0/Inquiry/transactionList', [
             'headers' => [
                 'Accept' => 'application/json',
-                'apiKey' => SecurityData::$AccessToken,
+                'apiKey' => config('hbl.AccessToken'),
                 'Content-Type' => 'application/json; charset=utf-8'
             ],
             'body' => $stringRequest
@@ -64,7 +64,7 @@ class Inquiry extends ActionRequest
     {
         $now = Carbon::now();
 
-        $officeId = SecurityData::$OfficeId;
+        $officeId = config('hbl.OfficeId');
         $orderNo = "1635476979216";
 
         $request = [
@@ -91,17 +91,17 @@ class Inquiry extends ActionRequest
 
         $payload = [
             "request" => $request,
-            "iss" => SecurityData::$AccessToken,
+            "iss" => config('hbl.AccessToken'),
             "aud" => "PacoAudience",
-            "CompanyApiKey" => SecurityData::$AccessToken,
+            "CompanyApiKey" => config('hbl.AccessToken'),
             "iat" => $now->unix(),
             "nbf" => $now->unix(),
             "exp" => $now->addHour()->unix(),
         ];
 
         $stringPayload = json_encode($payload);
-        $signingKey = $this->GetPrivateKey(SecurityData::$MerchantSigningPrivateKey);
-        $encryptingKey = $this->GetPublicKey(SecurityData::$PacoEncryptionPublicKey);
+        $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
+        $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
 
         $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
 
@@ -109,15 +109,15 @@ class Inquiry extends ActionRequest
         $response = $this->client->post('api/1.0/Inquiry/transactionList', [
             'headers' => [
                 'Accept' => 'application/jose',
-                'CompanyApiKey' => SecurityData::$AccessToken,
+                'CompanyApiKey' => config('hbl.AccessToken'),
                 'Content-Type' => 'application/jose; charset=utf-8'
             ],
             'body' => $body
         ]);
 
         $token = $response->getBody()->getContents();
-        $decryptingKey = $this->GetPrivateKey(SecurityData::$MerchantDecryptionPrivateKey);
-        $signatureVerificationKey = $this->GetPublicKey(SecurityData::$PacoSigningPublicKey);
+        $decryptingKey = $this->GetPrivateKey(config('hbl.MerchantDecryptionPrivateKey'));
+        $signatureVerificationKey = $this->GetPublicKey(config('hbl.PacoSigningPublicKey'));
 
         return $this->DecryptToken($token, $decryptingKey, $signatureVerificationKey);
     }
