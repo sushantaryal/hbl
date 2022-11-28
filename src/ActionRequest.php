@@ -90,7 +90,7 @@ abstract class ActionRequest
             headerCheckerManager: new HeaderCheckerManager(
                 checkers: [
                     new AlgorithmChecker(
-                        supportedAlgorithms: [SecurityData::$JWSAlgorithm],
+                        supportedAlgorithms: [config('hbl.JWSAlgorithm')],
                         protectedHeader: true
                     ),
                 ],
@@ -103,7 +103,7 @@ abstract class ActionRequest
             checkers: [
                 new NotBeforeChecker(),
                 new ExpirationTimeChecker(),
-                new AudienceChecker(SecurityData::$AccessToken),
+                new AudienceChecker(config('hbl.AccessToken')),
                 new IssuerChecker(["PacoIssuer"]),
             ]
         );
@@ -148,11 +148,11 @@ abstract class ActionRequest
             headerCheckerManager: new HeaderCheckerManager(
                 checkers: [
                     new AlgorithmChecker(
-                        supportedAlgorithms: [SecurityData::$JWEAlgorithm],
+                        supportedAlgorithms: [config('hbl.JWEAlgorithm')],
                         protectedHeader: true
                     ),
                     new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [SecurityData::$JWEEncrptionAlgorithm],
+                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
                         protectedHeader: true
                     )
                 ],
@@ -206,8 +206,8 @@ abstract class ActionRequest
             ->create()
             ->withPayload($payload)
             ->addSignature($signingKey, [
-                "alg" => SecurityData::$JWSAlgorithm,
-                "typ" => SecurityData::$TokenType,
+                "alg" => config('hbl.JWSAlgorithm'),
+                "typ" => config('hbl.TokenType'),
             ])
             ->build();
 
@@ -216,10 +216,10 @@ abstract class ActionRequest
             ->create()
             ->withPayload($this->jwsCompactSerializer->serialize($jws))
             ->withSharedProtectedHeader([
-                "alg" => SecurityData::$JWEAlgorithm,
-                "enc" => SecurityData::$JWEEncrptionAlgorithm,
-                "kid" => SecurityData::$EncryptionKeyId,
-                "typ" => SecurityData::$TokenType,
+                "alg" => config('hbl.JWEAlgorithm'),
+                "enc" => config('hbl.JWEEncrptionAlgorithm'),
+                "kid" => config('hbl.EncryptionKeyId'),
+                "typ" => config('hbl.TokenType'),
             ])
             ->addRecipient($encryptingKey)
             ->build();
