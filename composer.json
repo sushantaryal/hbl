@@ -2,13 +2,6 @@
     "name": "bickyraj/hbl",
     "description": "himalyan bank payment library",
     "license": "MIT",
-    "extra": {
-        "laravel": {
-            "providers": [
-                "bickyraj\\hbl\\HblServiceProvider"
-            ]
-        }
-    },
     "autoload": {
         "psr-4": {
             "Bickyraj\\Hbl\\": "src/"
