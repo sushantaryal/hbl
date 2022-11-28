@@ -40,7 +40,7 @@ use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
 {
-    private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
+    // private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
 
     protected Client $client;
 
@@ -62,7 +62,7 @@ abstract class ActionRequest
         }));
 
         $this->client = new Client([
-            'base_uri' => self::PaymentEndpoint,
+            'base_uri' => config('hbl.EndPoint'),
             'handler' => $handler
         ]);
 
