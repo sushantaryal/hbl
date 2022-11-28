@@ -1,6 +1,9 @@
 <?php
 
 return [
+
+    "OfficeId" => env('HBL_OFFICE_ID'),
+
     /**
      * payment end point
      */
