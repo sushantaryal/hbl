@@ -26,9 +26,9 @@ class HblController extends Controller
             //var_dump(json_decode($joseResponse));
             $response_obj = json_decode($joseResponse);
             //echo $response_obj->response->Data->paymentPage->paymentPageURL;
-            // header("Location: ".$response_obj->response->Data->paymentPage->paymentPageURL);
-            // exit();
-            return redirect()->to($response_obj->response->Data->paymentPage->paymentPageURL);
+            header("Location: ".$response_obj->response->Data->paymentPage->paymentPageURL);
+            exit();
+            // return redirect()->to($response_obj->response->Data->paymentPage->paymentPageURL);
         } catch (GuzzleException $e) {
             echo '\n Message: ' . $e->getMessage();
             echo '\n Trace: ' . $e->getTraceAsString();
