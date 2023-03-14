@@ -115,9 +115,9 @@ class Payment extends ActionRequest
                 "requestDateTime" => $now->utc()->format('Y-m-d\TH:i:s.v\Z'),
                 "language" => "en-US",
             ],
-            "officeId" => "DEMOOFFICE",
+            "officeId" => config('hbl.OfficeId'),
             "orderNo" => $orderNo,
-            "productDescription" => "desc for '$orderNo'",
+            "productDescription" => "Booking Payment",
             "paymentType" => "CC",
             "paymentCategory" => "ECOM",
             "storeCardDetails" => [
@@ -210,10 +210,10 @@ class Payment extends ActionRequest
      * @throws Exception
      */
 
-    public function ExecuteFormJose($mid, $api_key, $curr, $amt, $threeD, $success_url, $failed_url, $cancel_url, $backend_url): string
+    public function ExecuteFormJose($mid, $api_key, $curr, $amt, $threeD, $success_url, $failed_url, $cancel_url, $backend_url, $orderNo): string
     {
         $now = Carbon::now();
-        $orderNo = $now->getPreciseTimestamp(3);
+        // $orderNo = $now->getPreciseTimestamp(3);
 
         $request = [
             "apiRequest" => [
@@ -223,7 +223,7 @@ class Payment extends ActionRequest
             ],
             "officeId" => $mid,
             "orderNo" => $orderNo,
-            "productDescription" => "desc for '$orderNo'",
+            "productDescription" => "Booking Payment",
             "paymentType" => "CC",
             "paymentCategory" => "ECOM",
             "storeCardDetails" => [
@@ -255,25 +255,26 @@ class Payment extends ActionRequest
                 "browserUserAgent" => "PostmanRuntime/7.26.8 - not from header",
                 "mobileDeviceFlag" => "N"
             ],
-            "purchaseItems" => [
-                [
-                    "purchaseItemType" => "ticket",
-                    "referenceNo" => "2322460376026",
-                    "purchaseItemDescription" => "Bundled insurance",
-                    "purchaseItemPrice" => [
-                        "amountText" => "000000000100",
-                        "currencyCode" => "NPR",
-                        "decimalPlaces" => 2,
-                        "amount" => 1
-                    ],
-                    "subMerchantID" => "string",
-                    "passengerSeqNo" => 1
-                ]
-            ],
+            // "purchaseItems" => [
+            //     [
+            //         "purchaseItemType" => "ticket",
+            //         // "referenceNo" => "2322460376026",
+            //         "referenceNo" => $orderNo,
+            //         "purchaseItemDescription" => "Bundled insurance",
+            //         "purchaseItemPrice" => [
+            //             "amountText" => "000000000100",
+            //             "currencyCode" => "NPR",
+            //             "decimalPlaces" => 2,
+            //             "amount" => 1
+            //         ],
+            //         "subMerchantID" => "string",
+            //         "passengerSeqNo" => 1
+            //     ]
+            // ],
             "customFieldList" => [
                 [
-                    "fieldName" => "TestField",
-                    "fieldValue" => "This is test"
+                    "fieldName" => "RefID",
+                    "fieldValue" => $orderNo
                 ]
             ]
         ];
