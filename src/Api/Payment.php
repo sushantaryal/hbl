@@ -212,104 +212,108 @@ class Payment extends ActionRequest
 
     public function ExecuteFormJose($mid, $api_key, $curr, $amt, $threeD, $success_url, $failed_url, $cancel_url, $backend_url, $orderNo): string
     {
-        $now = Carbon::now();
-        // $orderNo = $now->getPreciseTimestamp(3);
+        try {
+            $now = Carbon::now();
+            // $orderNo = $now->getPreciseTimestamp(3);
 
-        $request = [
-            "apiRequest" => [
-                "requestMessageID" => $this->Guid(),
-                "requestDateTime" => $now->utc()->format('Y-m-d\TH:i:s.v\Z'),
-                "language" => "en-US",
-            ],
-            "officeId" => $mid,
-            "orderNo" => $orderNo,
-            "productDescription" => "Booking Payment",
-            "paymentType" => "CC",
-            "paymentCategory" => "ECOM",
-            "storeCardDetails" => [
-                "storeCardFlag" => "N",
-                "storedCardUniqueID" => "{{guid}}"
-            ],
-            "installmentPaymentDetails" => [
-                "ippFlag" => "N",
-                "installmentPeriod" => 0,
-                "interestType" => null
-            ],
-            "mcpFlag" => "N",
-            "request3dsFlag" => $threeD,
-            "transactionAmount" => [
-                "amountText" => str_pad(($amt==null ? 0 : $amt)*100, 12, "0", STR_PAD_LEFT),
-                "currencyCode" => $curr,
-                "decimalPlaces" => 2,
-                "amount" => $amt
-            ],
-            "notificationURLs" => [
-                "confirmationURL" => $success_url,
-                "failedURL" => $failed_url,
-                "cancellationURL" => $cancel_url,
-                "backendURL" => $backend_url
-            ],
-            "deviceDetails" => [
-                "browserIp" => "1.0.0.1",
-                "browser" => "Postman Browser",
-                "browserUserAgent" => "PostmanRuntime/7.26.8 - not from header",
-                "mobileDeviceFlag" => "N"
-            ],
-            // "purchaseItems" => [
-            //     [
-            //         "purchaseItemType" => "ticket",
-            //         // "referenceNo" => "2322460376026",
-            //         "referenceNo" => $orderNo,
-            //         "purchaseItemDescription" => "Bundled insurance",
-            //         "purchaseItemPrice" => [
-            //             "amountText" => "000000000100",
-            //             "currencyCode" => "NPR",
-            //             "decimalPlaces" => 2,
-            //             "amount" => 1
-            //         ],
-            //         "subMerchantID" => "string",
-            //         "passengerSeqNo" => 1
-            //     ]
-            // ],
-            "customFieldList" => [
-                [
-                    "fieldName" => "RefID",
-                    "fieldValue" => $orderNo
+            $request = [
+                "apiRequest" => [
+                    "requestMessageID" => $this->Guid(),
+                    "requestDateTime" => $now->utc()->format('Y-m-d\TH:i:s.v\Z'),
+                    "language" => "en-US",
+                ],
+                "officeId" => $mid,
+                "orderNo" => $orderNo,
+                "productDescription" => "Booking Payment",
+                "paymentType" => "CC",
+                "paymentCategory" => "ECOM",
+                "storeCardDetails" => [
+                    "storeCardFlag" => "N",
+                    "storedCardUniqueID" => "{{guid}}"
+                ],
+                "installmentPaymentDetails" => [
+                    "ippFlag" => "N",
+                    "installmentPeriod" => 0,
+                    "interestType" => null
+                ],
+                "mcpFlag" => "N",
+                "request3dsFlag" => $threeD,
+                "transactionAmount" => [
+                    "amountText" => str_pad(($amt==null ? 0 : $amt)*100, 12, "0", STR_PAD_LEFT),
+                    "currencyCode" => $curr,
+                    "decimalPlaces" => 2,
+                    "amount" => $amt
+                ],
+                "notificationURLs" => [
+                    "confirmationURL" => $success_url,
+                    "failedURL" => $failed_url,
+                    "cancellationURL" => $cancel_url,
+                    "backendURL" => $backend_url
+                ],
+                "deviceDetails" => [
+                    "browserIp" => "1.0.0.1",
+                    "browser" => "Postman Browser",
+                    "browserUserAgent" => "PostmanRuntime/7.26.8 - not from header",
+                    "mobileDeviceFlag" => "N"
+                ],
+                // "purchaseItems" => [
+                //     [
+                //         "purchaseItemType" => "ticket",
+                //         // "referenceNo" => "2322460376026",
+                //         "referenceNo" => $orderNo,
+                //         "purchaseItemDescription" => "Bundled insurance",
+                //         "purchaseItemPrice" => [
+                //             "amountText" => "000000000100",
+                //             "currencyCode" => "NPR",
+                //             "decimalPlaces" => 2,
+                //             "amount" => 1
+                //         ],
+                //         "subMerchantID" => "string",
+                //         "passengerSeqNo" => 1
+                //     ]
+                // ],
+                "customFieldList" => [
+                    [
+                        "fieldName" => "RefID",
+                        "fieldValue" => $orderNo
+                    ]
                 ]
-            ]
-        ];
+            ];
 
-        $payload = [
-            "request" => $request,
-            "iss" => $api_key,
-            "aud" => "PacoAudience",
-            "CompanyApiKey" => $api_key,
-            "iat" => $now->unix(),
-            "nbf" => $now->unix(),
-            "exp" => $now->addHour()->unix(),
-        ];
+            $payload = [
+                "request" => $request,
+                "iss" => $api_key,
+                "aud" => "PacoAudience",
+                "CompanyApiKey" => $api_key,
+                "iat" => $now->unix(),
+                "nbf" => $now->unix(),
+                "exp" => $now->addHour()->unix(),
+            ];
 
-        $stringPayload = json_encode($payload);
-        $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
-        $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
+            $stringPayload = json_encode($payload);
+            $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
+            $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
 
-        $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
+            $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
 
 
-        //third-party http client https://github.com/guzzle/guzzle
-        $response = $this->client->post('api/1.0/Payment/prePaymentUi', [
-            'headers' => [
-                'Accept' => 'application/jose',
-                'CompanyApiKey' => config('hbl.AccessToken'),
-                'Content-Type' => 'application/jose; charset=utf-8'
-            ],
-            'body' => $body
-        ]);
+            //third-party http client https://github.com/guzzle/guzzle
+            $response = $this->client->post('api/1.0/Payment/prePaymentUi', [
+                'headers' => [
+                    'Accept' => 'application/jose',
+                    'CompanyApiKey' => config('hbl.AccessToken'),
+                    'Content-Type' => 'application/jose; charset=utf-8'
+                ],
+                'body' => $body
+            ]);
 
-        $token = $response->getBody()->getContents();
-        $decryptingKey = $this->GetPrivateKey(config('hbl.MerchantDecryptionPrivateKey'));
-        $signatureVerificationKey = $this->GetPublicKey(config('hbl.PacoSigningPublicKey'));
+            $token = $response->getBody()->getContents();
+            $decryptingKey = $this->GetPrivateKey(config('hbl.MerchantDecryptionPrivateKey'));
+            $signatureVerificationKey = $this->GetPublicKey(config('hbl.PacoSigningPublicKey'));
 
-        return $this->DecryptToken($token, $decryptingKey, $signatureVerificationKey);
+            return $this->DecryptToken($token, $decryptingKey, $signatureVerificationKey);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }
