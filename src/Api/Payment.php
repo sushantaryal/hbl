@@ -205,16 +205,34 @@ class Payment extends ActionRequest
 
         return $this->DecryptToken($token, $decryptingKey, $signatureVerificationKey);
     }
-        /**
+
+
+    /**
      * @throws GuzzleException
      * @throws Exception
+     * @param $paymentObj accepts parameters like
+     * order_no - order number
+     * amount - amount to be transfered
+     * success_url - callback url of success
+     * failed_url - callback url of failed
+     * cancel_url - callback url of cancel
+     * backend_url - callback url of backend
+     * custom_fields - array of key and value
      */
-
-    public function ExecuteFormJose($mid, $api_key, $curr, $amt, $threeD, $success_url, $failed_url, $cancel_url, $backend_url, $orderNo): string
+    public function ExecuteFormJose(array $paymentObj = []): string
     {
         try {
             $now = Carbon::now();
-            // $orderNo = $now->getPreciseTimestamp(3);
+
+            $custom_fields = [];
+            if (isset($paymentObj['custom_fields']) && !empty($paymentObj['custom_fields'])) {
+                foreach ($paymentObj['custom_fields'] as $key => $value) {
+                    $custom_fields[] = [
+                        "fieldName" => $key,
+                        "fieldValue" => $value
+                    ];
+                }
+            }
 
             $request = [
                 "apiRequest" => [
@@ -222,8 +240,8 @@ class Payment extends ActionRequest
                     "requestDateTime" => $now->utc()->format('Y-m-d\TH:i:s.v\Z'),
                     "language" => "en-US",
                 ],
-                "officeId" => $mid,
-                "orderNo" => $orderNo,
+                "officeId" => config('hbl.OfficeId'),
+                "orderNo" => $paymentObj['order_no'],
                 "productDescription" => "Booking Payment",
                 "paymentType" => "CC",
                 "paymentCategory" => "ECOM",
@@ -237,18 +255,18 @@ class Payment extends ActionRequest
                     "interestType" => null
                 ],
                 "mcpFlag" => "N",
-                "request3dsFlag" => $threeD,
+                "request3dsFlag" => config('hbl.Input3DS'),
                 "transactionAmount" => [
-                    "amountText" => str_pad(($amt==null ? 0 : $amt)*100, 12, "0", STR_PAD_LEFT),
-                    "currencyCode" => $curr,
+                    "amountText" => str_pad(($paymentObj['amount'] == null ? 0 : $paymentObj['amount']) * 100, 12, "0", STR_PAD_LEFT),
+                    "currencyCode" => config('hbl.InputCurrencty'),
                     "decimalPlaces" => 2,
-                    "amount" => $amt
+                    "amount" => $paymentObj['amount']
                 ],
                 "notificationURLs" => [
-                    "confirmationURL" => $success_url,
-                    "failedURL" => $failed_url,
-                    "cancellationURL" => $cancel_url,
-                    "backendURL" => $backend_url
+                    "confirmationURL" => $paymentObj['success_url'],
+                    "failedURL" => $paymentObj['failed_url'],
+                    "cancellationURL" => $paymentObj['cancel_url'],
+                    "backendURL" => $paymentObj['backend_url']
                 ],
                 "deviceDetails" => [
                     "browserIp" => "1.0.0.1",
@@ -272,24 +290,20 @@ class Payment extends ActionRequest
                 //         "passengerSeqNo" => 1
                 //     ]
                 // ],
-                "customFieldList" => [
-                    [
-                        "fieldName" => "RefID",
-                        "fieldValue" => $orderNo
-                    ]
-                ]
+                "customFieldList" => $custom_fields
             ];
 
             $payload = [
                 "request" => $request,
-                "iss" => $api_key,
+                "iss" => config('hbl.AccessToken'),
                 "aud" => "PacoAudience",
-                "CompanyApiKey" => $api_key,
+                "CompanyApiKey" => config('hbl.AccessToken'),
                 "iat" => $now->unix(),
                 "nbf" => $now->unix(),
                 "exp" => $now->addHour()->unix(),
             ];
 
+            // dd($payload);
             $stringPayload = json_encode($payload);
             $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
             $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));

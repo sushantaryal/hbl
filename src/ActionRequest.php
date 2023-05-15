@@ -3,7 +3,6 @@
 namespace Bickyraj\Hbl;
 
 use Exception;
-use Bickyraj\Hbl\Config\SecurityData;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
