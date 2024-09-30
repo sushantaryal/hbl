@@ -16,10 +16,11 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^8.2",
-        "web-token/jwt-framework": "4.0.x-dev",
-        "guzzlehttp/guzzle": "8.0.x-dev",
-        "nesbot/carbon": "^3.0@dev",
-        "ext-openssl": "*"
+        "web-token/jwt-framework": "^4.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "nesbot/carbon": "^3.0",
+        "ext-openssl": "*",
+        "brick/math": "^0.12"
     },
     "config": {
         "platform-check": false
