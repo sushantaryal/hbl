@@ -19,7 +19,6 @@ use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\RSAOAEP;
-use Jose\Component\Encryption\Compression\CompressionMethodManager;
 use Jose\Component\Encryption\JWEBuilder;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\JWELoader;
@@ -34,13 +33,13 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer as JWSCompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Jose\Easy\ContentEncryptionAlgorithmChecker;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\Clock\Clock;
 
 abstract class ActionRequest
 {
     // private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
-
+    private Clock $clock;
     protected Client $client;
 
     private JWSCompactSerializer $jwsCompactSerializer;
@@ -54,6 +53,7 @@ abstract class ActionRequest
 
     public function __construct()
     {
+        $clock = new Clock();
         $handler = HandlerStack::create();
 
         $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
@@ -100,8 +100,8 @@ abstract class ActionRequest
         );
         $this->claimCheckerManager = new ClaimCheckerManager(
             checkers: [
-                new NotBeforeChecker(),
-                new ExpirationTimeChecker(),
+                new NotBeforeChecker($clock),
+                new ExpirationTimeChecker($clock),
                 new AudienceChecker(config('hbl.AccessToken')),
                 new IssuerChecker(["PacoIssuer"]),
             ]
@@ -109,54 +109,33 @@ abstract class ActionRequest
 
         $this->jweCompactSerializer = new JWECompactSerializer();
         $this->jweBuilder = new JWEBuilder(
-            keyEncryptionAlgorithmManager: new AlgorithmManager(
-                algorithms: [
-                    new RSAOAEP()
-                ]
-            ),
-            contentEncryptionAlgorithmManager: new AlgorithmManager(
-                algorithms: [
-                    new A128CBCHS256()
-                ]
-            ),
-            compressionManager: new CompressionMethodManager(
-                methods: []
-            )
-        );
+            new AlgorithmManager([
+                new RSAOAEP() // Key Encryption Algorithm
+            ]));
         $this->jweLoader = new JWELoader(
             serializerManager: new JWESerializerManager(
                 serializers: [
                     new JWECompactSerializer(),
                 ]
             ),
-            jweDecrypter: new JWEDecrypter(
-                keyEncryptionAlgorithmManager: new AlgorithmManager(
-                    algorithms: [
-                        new RSAOAEP()
-                    ]
-                ),
-                contentEncryptionAlgorithmManager: new AlgorithmManager(
-                    algorithms: [
-                        new A128CBCHS256()
-                    ]
-                ),
-                compressionMethodManager: new CompressionMethodManager(
-                    methods: [],
-                )
-            ),
+            jweDecrypter: new JWEDecrypter(new AlgorithmManager(
+                algorithms: [
+                    new RSAOAEP()
+                ]
+            )),
             headerCheckerManager: new HeaderCheckerManager(
-                checkers: [
+                [
                     new AlgorithmChecker(
-                        supportedAlgorithms: [config('hbl.JWEAlgorithm')],
-                        protectedHeader: true
+                        [config('hbl.JWEAlgorithm')], // Supported algorithms for key encryption
+                        true // Protected Header
                     ),
-                    new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
-                        protectedHeader: true
+                    new AlgorithmChecker(
+                        [config('hbl.JWEEncrptionAlgorithm')], // Supported algorithms for content encryption
+                        true // Protected Header
                     )
                 ],
-                tokenTypes: [
-                    new JWETokenSupport(),
+                [
+                    new JWETokenSupport() // Supported Token Type
                 ]
             )
         );
