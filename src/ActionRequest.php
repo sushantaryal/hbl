@@ -98,10 +98,11 @@ abstract class ActionRequest
                 ]
             ),
         );
+        $allowedTimeDrift = 60; // Example: allow 60 seconds drift
         $this->claimCheckerManager = new ClaimCheckerManager(
             checkers: [
-                new NotBeforeChecker($clock),
-                new ExpirationTimeChecker($clock),
+                new NotBeforeChecker($allowedTimeDrift),
+                new ExpirationTimeChecker($allowedTimeDrift),
                 new AudienceChecker(config('hbl.AccessToken')),
                 new IssuerChecker(["PacoIssuer"]),
             ]
@@ -111,18 +112,21 @@ abstract class ActionRequest
         $this->jweBuilder = new JWEBuilder(
             new AlgorithmManager([
                 new RSAOAEP() // Key Encryption Algorithm
-            ]));
+            ]),
+            new AlgorithmManager([
+                new A128CBCHS256() // Content Encryption Algorithm
+            ])
+        );
         $this->jweLoader = new JWELoader(
             serializerManager: new JWESerializerManager(
                 serializers: [
                     new JWECompactSerializer(),
                 ]
             ),
-            jweDecrypter: new JWEDecrypter(new AlgorithmManager(
-                algorithms: [
-                    new RSAOAEP()
-                ]
-            )),
+            jweDecrypter: new JWEDecrypter(
+                new AlgorithmManager([new RSAOAEP()]),  // Key Encryption Algorithm
+                new AlgorithmManager([new A128CBCHS256()])  // Content Encryption Algorithm
+            ),
             headerCheckerManager: new HeaderCheckerManager(
                 [
                     new AlgorithmChecker(
