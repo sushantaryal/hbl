@@ -7,7 +7,7 @@ return [
     /**
      * payment end point
      */
-    "EndPoint" => env('HBL_PAYMENT_END_POINT'),
+    "EndPoint" => "https://core.paco.2c2p.com/",
 
     /**
      * JWE Key Id.
@@ -74,10 +74,10 @@ return [
     /**
     * Input Currecy for example USD or NRP.
     */
-    "InputCurrencty" => env('HBL_INPUT_CURRENCY'),
+    "InputCurrencty" => "USD",
 
     /**
     * Input 3DS should be Y for production and N for development
     */
-    "Input3DS" => env('HBL_INPUT_3D'),
+    "Input3DS" => "Y",
 ];
