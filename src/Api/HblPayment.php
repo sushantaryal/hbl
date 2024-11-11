@@ -11,10 +11,7 @@ class HblPayment implements IHblPayment
     {
         $payment = new Payment();
         $joseResponse = $payment->ExecuteFormJose($paymentObject->toArray());
-        //echo "Response data : <pre>\n";
-        //var_dump(json_decode($joseResponse));
         $response_obj = json_decode($joseResponse);
-        //echo $response_obj->response->Data->paymentPage->paymentPageURL;
         header("Location: " . $response_obj->response->Data->paymentPage->paymentPageURL);
         exit();
     }
