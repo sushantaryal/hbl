@@ -4,7 +4,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Bickyraj\\Hbl\\": "src/"
+            "Bickyraj\\Hbl\\": "src/",
+            "Brick\\Math\\": "vendor/brick/math/src"
         }
     },
     "authors": [
