@@ -34,7 +34,6 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer as JWSCompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Jose\Easy\ContentEncryptionAlgorithmChecker;
 use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
@@ -109,7 +108,7 @@ abstract class ActionRequest
 
         $this->jweCompactSerializer = new JWECompactSerializer();
         $this->jweBuilder = new JWEBuilder(
-            keyEncryptionAlgorithmManager: new AlgorithmManager(
+            algorithmManager: new AlgorithmManager(
                 algorithms: [
                     new RSAOAEP()
                 ]
@@ -130,7 +129,7 @@ abstract class ActionRequest
                 ]
             ),
             jweDecrypter: new JWEDecrypter(
-                keyEncryptionAlgorithmManager: new AlgorithmManager(
+                algorithmManager: new AlgorithmManager(
                     algorithms: [
                         new RSAOAEP()
                     ]
@@ -139,9 +138,6 @@ abstract class ActionRequest
                     algorithms: [
                         new A128CBCHS256()
                     ]
-                ),
-                compressionMethodManager: new CompressionMethodManager(
-                    methods: [],
                 )
             ),
             headerCheckerManager: new HeaderCheckerManager(
@@ -150,10 +146,10 @@ abstract class ActionRequest
                         supportedAlgorithms: [config('hbl.JWEAlgorithm')],
                         protectedHeader: true
                     ),
-                    new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
-                        protectedHeader: true
-                    )
+//                    new ContentEncryptionAlgorithmChecker(
+//                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
+//                        protectedHeader: true
+//                    )
                 ],
                 tokenTypes: [
                     new JWETokenSupport(),
