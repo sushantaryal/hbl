@@ -14,6 +14,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "web-token/jwt-framework": "^3.4",
         "guzzlehttp/guzzle": "^7.0",
