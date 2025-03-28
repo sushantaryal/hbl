@@ -19,8 +19,7 @@
         "web-token/jwt-framework": "^3.4",
         "guzzlehttp/guzzle": "^7.0",
         "nesbot/carbon": "^2.56",
-        "ext-openssl": "*",
-        "lcobucci/clock": "3.4.x-dev"
+        "ext-openssl": "*"
     },
     "config": {
         "platform-check": false
