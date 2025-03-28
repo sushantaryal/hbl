@@ -15,11 +15,11 @@ use Jose\Component\Checker\InvalidClaimException;
 use Jose\Component\Checker\IssuerChecker;
 use Jose\Component\Checker\MissingMandatoryClaimException;
 use Jose\Component\Checker\NotBeforeChecker;
-use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\RSAOAEP;
+use Jose\Component\Encryption\Compression\CompressionMethodManager;
 use Jose\Component\Encryption\JWEBuilder;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\JWELoader;
@@ -34,10 +34,13 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer as JWSCompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Jose\Easy\ContentEncryptionAlgorithmChecker;
 use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
 {
+    // private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
+
     protected Client $client;
 
     private JWSCompactSerializer $jwsCompactSerializer;
@@ -106,10 +109,18 @@ abstract class ActionRequest
 
         $this->jweCompactSerializer = new JWECompactSerializer();
         $this->jweBuilder = new JWEBuilder(
-            algorithmManager: new AlgorithmManager(
+            keyEncryptionAlgorithmManager: new AlgorithmManager(
                 algorithms: [
                     new RSAOAEP()
                 ]
+            ),
+            contentEncryptionAlgorithmManager: new AlgorithmManager(
+                algorithms: [
+                    new A128CBCHS256()
+                ]
+            ),
+            compressionManager: new CompressionMethodManager(
+                methods: []
             )
         );
         $this->jweLoader = new JWELoader(
@@ -119,7 +130,7 @@ abstract class ActionRequest
                 ]
             ),
             jweDecrypter: new JWEDecrypter(
-                algorithmManager: new AlgorithmManager(
+                keyEncryptionAlgorithmManager: new AlgorithmManager(
                     algorithms: [
                         new RSAOAEP()
                     ]
@@ -128,6 +139,9 @@ abstract class ActionRequest
                     algorithms: [
                         new A128CBCHS256()
                     ]
+                ),
+                compressionMethodManager: new CompressionMethodManager(
+                    methods: [],
                 )
             ),
             headerCheckerManager: new HeaderCheckerManager(
@@ -137,7 +151,7 @@ abstract class ActionRequest
                         protectedHeader: true
                     ),
                     new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [config('hbl.JWEEncryptionAlgorithm')],
+                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
                         protectedHeader: true
                     )
                 ],
@@ -202,7 +216,7 @@ abstract class ActionRequest
             ->withPayload($this->jwsCompactSerializer->serialize($jws))
             ->withSharedProtectedHeader([
                 "alg" => config('hbl.JWEAlgorithm'),
-                "enc" => config('JWEEncryptionAlgorithm'),
+                "enc" => config('hbl.JWEEncrptionAlgorithm'),
                 "kid" => config('hbl.EncryptionKeyId'),
                 "typ" => config('hbl.TokenType'),
             ])
