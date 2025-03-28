@@ -39,8 +39,6 @@ use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
 {
-    // private const PaymentEndpoint = "https://core.demo-paco.2c2p.com/";
-
     protected Client $client;
 
     private JWSCompactSerializer $jwsCompactSerializer;
