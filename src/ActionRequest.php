@@ -20,7 +20,6 @@ use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\RSAOAEP;
-use Jose\Component\Encryption\Compression\CompressionMethodManager;
 use Jose\Component\Encryption\JWEBuilder;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\JWELoader;
@@ -111,14 +110,6 @@ abstract class ActionRequest
                 algorithms: [
                     new RSAOAEP()
                 ]
-            ),
-            contentEncryptionAlgorithmManager: new AlgorithmManager(
-                algorithms: [
-                    new A128CBCHS256()
-                ]
-            ),
-            compressionManager: new CompressionMethodManager(
-                methods: []
             )
         );
         $this->jweLoader = new JWELoader(
@@ -137,9 +128,6 @@ abstract class ActionRequest
                     algorithms: [
                         new A128CBCHS256()
                     ]
-                ),
-                compressionMethodManager: new CompressionMethodManager(
-                    methods: [],
                 )
             ),
             headerCheckerManager: new HeaderCheckerManager(
@@ -149,7 +137,7 @@ abstract class ActionRequest
                         protectedHeader: true
                     ),
                     new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [config('JWEEncryptionAlgorithm')],
+                        supportedAlgorithms: [config('hbl.JWEEncryptionAlgorithm')],
                         protectedHeader: true
                     )
                 ],
