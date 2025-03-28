@@ -5,7 +5,7 @@
     "autoload": {
         "psr-4": {
             "Bickyraj\\Hbl\\": "src/",
-            "Brick\\Math\\": "vendor/brick/math/src"
+            "Brick\\Math\\": "src/brick/math/src"
         }
     },
     "authors": [
