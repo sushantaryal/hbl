@@ -258,7 +258,7 @@ class Payment extends ActionRequest
                 "request3dsFlag" => config('hbl.Input3DS'),
                 "transactionAmount" => [
                     "amountText" => str_pad(($paymentObj['amount'] == null ? 0 : $paymentObj['amount']) * 100, 12, "0", STR_PAD_LEFT),
-                    "currencyCode" => config('hbl.InputCurrencty'),
+                    "currencyCode" => config('hbl.InputCurrency'),
                     "decimalPlaces" => 2,
                     "amount" => $paymentObj['amount']
                 ],

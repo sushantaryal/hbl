@@ -46,7 +46,7 @@ return [
      * algorithm used on the plaintext to produce the encrypted ciphertext.
      *
      */
-    "JWEEncrptionAlgorithm" => "A128CBC-HS256",
+    "JWEEncryptionAlgorithm" => "A128CBC-HS256",
 
     /**
      * Merchant Signing Private Key is used to cryptographically sign and create the request JWS.
@@ -74,7 +74,7 @@ return [
     /**
     * Input Currecy for example USD or NRP.
     */
-    "InputCurrencty" => "USD",
+    "InputCurrency" => "USD",
 
     /**
     * Input 3DS should be Y for production and N for development

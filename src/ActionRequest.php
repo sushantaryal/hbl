@@ -15,6 +15,7 @@ use Jose\Component\Checker\InvalidClaimException;
 use Jose\Component\Checker\IssuerChecker;
 use Jose\Component\Checker\MissingMandatoryClaimException;
 use Jose\Component\Checker\NotBeforeChecker;
+use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256;
@@ -34,7 +35,6 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer as JWSCompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Jose\Easy\ContentEncryptionAlgorithmChecker;
 use Psr\Http\Message\RequestInterface;
 
 abstract class ActionRequest
@@ -107,7 +107,7 @@ abstract class ActionRequest
 
         $this->jweCompactSerializer = new JWECompactSerializer();
         $this->jweBuilder = new JWEBuilder(
-            keyEncryptionAlgorithmManager: new AlgorithmManager(
+            algorithmManager: new AlgorithmManager(
                 algorithms: [
                     new RSAOAEP()
                 ]
@@ -128,7 +128,7 @@ abstract class ActionRequest
                 ]
             ),
             jweDecrypter: new JWEDecrypter(
-                keyEncryptionAlgorithmManager: new AlgorithmManager(
+                algorithmManager: new AlgorithmManager(
                     algorithms: [
                         new RSAOAEP()
                     ]
@@ -149,7 +149,7 @@ abstract class ActionRequest
                         protectedHeader: true
                     ),
                     new ContentEncryptionAlgorithmChecker(
-                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
+                        supportedAlgorithms: [config('JWEEncryptionAlgorithm')],
                         protectedHeader: true
                     )
                 ],
@@ -214,7 +214,7 @@ abstract class ActionRequest
             ->withPayload($this->jwsCompactSerializer->serialize($jws))
             ->withSharedProtectedHeader([
                 "alg" => config('hbl.JWEAlgorithm'),
-                "enc" => config('hbl.JWEEncrptionAlgorithm'),
+                "enc" => config('JWEEncryptionAlgorithm'),
                 "kid" => config('hbl.EncryptionKeyId'),
                 "typ" => config('hbl.TokenType'),
             ])
