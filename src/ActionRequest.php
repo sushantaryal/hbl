@@ -207,7 +207,7 @@ abstract class ActionRequest
             ->withPayload($this->jwsCompactSerializer->serialize($jws))
             ->withSharedProtectedHeader([
                 "alg" => config('hbl.JWEAlgorithm'),
-                "enc" => config('hbl.JWEEncrptionAlgorithm'),
+                "enc" => config('hbl.JWEEncryptionAlgorithm'),
                 "kid" => config('hbl.EncryptionKeyId'),
                 "typ" => config('hbl.TokenType'),
             ])
