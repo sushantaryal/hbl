@@ -110,12 +110,17 @@ abstract class ActionRequest
         $this->jweBuilder = new JWEBuilder(
             algorithmManager: new AlgorithmManager(
                 algorithms: [
-                    new RSAOAEP(),
-                    new A128CBCHS256()
+                    new RSAOAEP()
                 ],
             ),
-            contentEncryptionAlgorithmManager: null,
-            compressionManager: null
+            contentEncryptionAlgorithmManager: new AlgorithmManager(
+                algorithms: [
+                    new A128CBCHS256()
+                ]
+            ),
+            compressionManager: new CompressionMethodManager(
+                methods: []
+            )
         );
         $this->jweLoader = new JWELoader(
             serializerManager: new JWESerializerManager(
