@@ -141,10 +141,10 @@ abstract class ActionRequest
                         supportedAlgorithms: [config('hbl.JWEAlgorithm')],
                         protectedHeader: true
                     ),
-//                    new ContentEncryptionAlgorithmChecker(
-//                        supportedAlgorithms: [config('hbl.JWEEncrptionAlgorithm')],
-//                        protectedHeader: true
-//                    )
+                    new ContentEncryptionAlgorithmChecker(
+                        supportedAlgorithms: [config('hbl.JWEEncryptionAlgorithm')],
+                        protectedHeader: true
+                    )
                 ],
                 tokenTypes: [
                     new JWETokenSupport(),
