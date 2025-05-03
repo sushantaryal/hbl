@@ -72,7 +72,7 @@ return [
     "MerchantDecryptionPrivateKey" => env('HBL_PRIVATE_KEY_JWE'),
 
     /**
-    * Input Currecy for example USD or NRP.
+    * Input Currency for example USD or NPR.
     */
     "InputCurrency" => "USD",
 
