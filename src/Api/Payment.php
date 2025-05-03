@@ -292,8 +292,6 @@ class Payment extends ActionRequest
                 "customFieldList" => $custom_fields
             ];
 
-//            dd($request);
-
             $payload = [
                 "request" => $request,
                 "iss" => config('hbl.AccessToken'),
@@ -309,8 +307,6 @@ class Payment extends ActionRequest
             $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
 
             $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
-//            dump($body);
-//            die('he');
 
             //third-party http client https://github.com/guzzle/guzzle
             $response = $this->client->post('api/1.0/Payment/prePaymentUi', [
