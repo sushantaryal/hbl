@@ -247,7 +247,7 @@ class Payment extends ActionRequest
                 "paymentCategory" => "ECOM",
                 "storeCardDetails" => [
                     "storeCardFlag" => "N",
-                    "storedCardUniqueID" => "{{guid}}"
+                    "storedCardUniqueID" => $this->Guid()
                 ],
                 "installmentPaymentDetails" => [
                     "ippFlag" => "N",
@@ -274,24 +274,25 @@ class Payment extends ActionRequest
                     "browserUserAgent" => "PostmanRuntime/7.26.8 - not from header",
                     "mobileDeviceFlag" => "N"
                 ],
-                // "purchaseItems" => [
-                //     [
-                //         "purchaseItemType" => "ticket",
-                //         // "referenceNo" => "2322460376026",
-                //         "referenceNo" => $orderNo,
-                //         "purchaseItemDescription" => "Bundled insurance",
-                //         "purchaseItemPrice" => [
-                //             "amountText" => "000000000100",
-                //             "currencyCode" => "NPR",
-                //             "decimalPlaces" => 2,
-                //             "amount" => 1
-                //         ],
-                //         "subMerchantID" => "string",
-                //         "passengerSeqNo" => 1
-                //     ]
-                // ],
+                "purchaseItems" => [
+                    [
+                        "purchaseItemType" => "ticket",
+                        "referenceNo" => $paymentObj['order_no'],
+                        "purchaseItemDescription" => "Bundled insurance",
+                        "purchaseItemPrice" => [
+                            "amountText" => $paymentObj['amount'],
+                            "currencyCode" => config('hbl.InputCurrency'),
+                            "decimalPlaces" => 2,
+                            "amount" => $paymentObj['amount']
+                        ],
+                        "subMerchantID" => "string",
+                        "passengerSeqNo" => 1
+                    ]
+                ],
                 "customFieldList" => $custom_fields
             ];
+
+//            dd($request);
 
             $payload = [
                 "request" => $request,
@@ -303,13 +304,13 @@ class Payment extends ActionRequest
                 "exp" => $now->addHour()->unix(),
             ];
 
-            // dd($payload);
             $stringPayload = json_encode($payload);
             $signingKey = $this->GetPrivateKey(config('hbl.MerchantSigningPrivateKey'));
             $encryptingKey = $this->GetPublicKey(config('hbl.PacoEncryptionPublicKey'));
 
             $body = $this->EncryptPayload($stringPayload, $signingKey, $encryptingKey);
-
+//            dump($body);
+//            die('he');
 
             //third-party http client https://github.com/guzzle/guzzle
             $response = $this->client->post('api/1.0/Payment/prePaymentUi', [
